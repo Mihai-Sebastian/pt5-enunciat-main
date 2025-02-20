@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Llista de Tasques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function handleCheckbox(form) {
+            const checkbox = form.querySelector('input[name="filtreComplecioCheckbox"]');
+            const filtreComplecio = form.querySelector('input[name="filtreComplecio"]');
+
+            if (!checkbox.checked) {
+                filtreComplecio.value = "false";
+            } else {
+                filtreComplecio.value = "true";
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <h1 class="text-blue-500 text-center mt-5 text-2xl">Llista de Tasques</h1>
+    <div id="errormessages" th:if="${errorMessage}"
+        class="bg-red-100 text-red-700 p-5 rounded-lg shadow-md mx-20 mt-5 mb-2.5" th:text="${errorMessage}"></div>
+
+    <section class="container px-4 mx-auto">
+        <div class="flex">
+            <!-- Columna de filtres -->
+            <div class="w-1/4 p-4 bg-white rounded-md shadow-md">
+                <form th:action="@{/}" method="get">
+                    <div class="mb-4">
+                        <label for="filtreDescripcio" class="block mb-2">Filtrar per descripció:</label>
+                        <input type="text" id="filtreDescripcio" name="filtreDescripcio" th:value="${filtreDescripcio}" placeholder="Cerca"
+                            class="bg-white p-2 border border-gray-300 rounded-md w-full">
+                    </div>
+                    <button type="submit"
+                        class="bg-green-500 text-white border-none p-2 rounded-md cursor-pointer hover:bg-green-600 w-full">
+                        Filtrar per descripció</button>
+                </form>
+
+                <form th:action="@{/}" method="get" onsubmit="handleCheckbox(this)" class="mt-4">
+                    <div class="mb-4">
+                        <label for="filtreComplecio" class="block mb-2">Filtrar per compleció:</label>
+                        <input type="hidden" id="filtreComplecio" name="filtreComplecio">
+                        <input type="checkbox" id="filtreComplecioCheckbox" name="filtreComplecioCheckbox" th:checked="${filtreComplecio}"
+                            class="bg-white p-2 border border-gray-300 rounded-md">
+                    </div>
+                    <button type="submit"
+                        class="bg-yellow-500 text-white border-none p-2 rounded-md cursor-pointer hover:bg-yellow-600 w-full">
+                        Filtrar per compleció</button>
+                </form>
+
+                <form th:action="@{/}" method="get" class="mt-4">
+                    <button type="submit"
+                        class="bg-red-500 text-white border-none p-2 rounded-md cursor-pointer hover:bg-red-600 w-full">
+                        Netejar filtres</button>
+                </form>
+            </div>
+
+            <!-- Columna de taula -->
+            <div class="w-3/4 p-4">
+                <div class="sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <div class="flex items-center gap-x-3">
+                            <h2 class="text-lg font-medium">Nombre total de tasques: </h2>
+        
+                            <span th:text="${nombreTasques}" class="px-3 py-1 text-blue-600 bg-blue-100 rounded-full">240
+                                vendors</span>
+                        </div>
+                    </div>
+        
+                </div>
+                <div class="flex flex-col mt-6">
+                    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                        <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                            <div class="overflow-hidden border border-gray-200 md:rounded-lg">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="py-3.5 px-4 font-normal text-left">
+                                                Descripció
+                                            </th>
+                                            <th scope="col" class="px-12 py-3.5 font-normal text-left">
+                                                Estat
+                                            </th>
+                                            <th scope="col" class="px-4 py-3.5 font-normal text-left">
+                                                Prioritat
+                                            </th>
+                                            <th scope="col" class="px-4 py-3.5 font-normal text-left">
+                                                Data Inici
+                                            </th>
+                                            <th scope="col" class="px-4 py-3.5 font-normal text-left">
+                                        Data Fi Prevista
+                                            </th>
+                                            <th scope="col" class="px-4 py-3.5 font-normal text-left">
+                                        Data Fi Real
+                                            </th>
+                                            <th scope="col" class="px-4 py-3.5 font-normal text-left">
+                                                Accions
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr th:each="tasca : ${tasques}">
+                                            <td class="px-4 py-4 text-sm font-medium whitespace-nowrap">
+                                                <div>
+                                                    <h2 th:text="${tasca.descripcio}" class="font-medium text-gray-800"></h2>
+                                                </div>
+                                            </td>
+                                            <td class="px-12 py-4 text-sm font-medium whitespace-nowrap">
+                                                <div th:text="${tasca.completada ? 'Completada' : 'Pendent'}"
+                                                    class="inline px-3 py-1 text-sm font-normal rounded-full"
+                                                    th:classappend="${tasca.completada ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}">
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-4 text-sm font-medium whitespace-nowrap">
+                                                <div th:text="${tasca.prioritat}" class="font-medium text-gray-800"></div>
+                                            </td>
+                                            <td class="px-4 py-4 text-sm font-medium whitespace-nowrap">
+                                                <div th:text="${tasca.dataInici}" class="font-medium text-gray-800"></div>
+                                            </td>
+                                            <td class="px-4 py-4 text-sm font-medium whitespace-nowrap">
+                                                <div th:text="${tasca.dataFiPrevista}" class="font-medium text-gray-800"></div>
+                                            </td>
+                                            <td class="px-4 py-4 text-sm font-medium whitespace-nowrap">
+                                                <div th:text="${tasca.dataFiReal}" class="font-medium text-gray-800"></div>
+                                            </td>
+                                            <td class="px-4 py-4 text-sm whitespace-nowrap">
+                                                <div class="flex space-x-2">
+                                                    <form th:action="@{/tasques/update/{id}/completar(id=${tasca.id})}"
+                                                        method="post">
+                                                        <button type="submit"
+                                                            class="bg-blue-500 text-white border-none p-2 rounded-md cursor-pointer hover:bg-blue-600">
+                                                            Marcar Completada
+                                                        </button>
+                                                    </form>
+                                                    <form th:action="@{/tasques/delete/{id}(id=${tasca.id})}" method="post">
+                                                        <button type="submit"
+                                                            class="bg-red-500 text-white border-none p-2 rounded-md cursor-pointer hover:bg-red-600">
+                                                            Eliminar</button>
+                                                    </form>
+                                                    <form th:action="@{/tasques/edit/{id}(id=${tasca.id})}" method="get">
+                                                        <button type="submit"
+                                                            class="bg-yellow-500 text-white border-none p-2 rounded-md cursor-pointer hover:bg-yellow-600">
+                                                            Editar</button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <a th:href="@{/tasques/create}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 block text-center mt-5 w-36">Crear nova tasca</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+</body>
+
+</html>

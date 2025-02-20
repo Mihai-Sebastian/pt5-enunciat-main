@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Tasca</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-4">
+        <div id="errormessages" th:if="${errorMessage}" class="bg-red-100 text-red-700 p-5 rounded-lg shadow-md mx-20 mt-5 mb-2.5" th:text="${errorMessage}"></div>
+        <form id="edit_tasca" th:action="@{/tasques/update/{id}(id=${tasca.id})}" th:object="${tasca}" method="post" class="bg-white p-6 rounded shadow-md">
+            <h1 class="text-blue-500 text-center mt-5 text-2xl">Editar Tasca</h1>
+
+            <div class="mb-4">
+                <label for="descripcio" class="block text-gray-700">Descripció:</label>
+                <input type="text" id="descripcio" th:field="*{descripcio}" class="w-full p-2 border border-gray-300 rounded-md" />
+            </div>
+            <div class="mb-4 flex items-center">
+                <label for="completada" class="block text-gray-700 mr-2">Completada:</label>
+                <input type="checkbox" id="completada" th:field="*{completada}" class="p-2 border border-gray-300 rounded-md" />
+            </div>
+            <div class="mb-4">
+                <label for="dataInici" class="block text-gray-700">Data Inici:</label>
+                <input type="date" id="dataInici" th:field="*{dataInici}" class="p-2 border border-gray-300 rounded-md w-52" />
+            </div>
+            <div class="mb-4">
+                <label for="dataFiPrevista" class="block text-gray-700">Data Fi Prevista:</label>
+                <input type="date" id="dataFiPrevista" th:field="*{dataFiPrevista}" class="p-2 border border-gray-300 rounded-md w-52" />
+            </div>
+            <div class="mb-4">
+                <label for="dataFiReal" class="block text-gray-700">Data Fi Real:</label>
+                <input type="date" id="dataFiReal" th:field="*{dataFiReal}" class="p-2 border border-gray-300 rounded-md w-52" readonly />
+            </div>
+
+            <div class="mb-4">
+                <label for="prioritat" class="block text-gray-700">Prioritat:</label>
+                <input type="number" id="prioritat" th:field="*{prioritat}" class="p-2 border border-gray-300 rounded-md w-36" />
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Guardar</button>
+                <a th:href="@{/}" class="block text-blue-500 text-center mt-5 hover:underline">Cancel·lar</a>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>
