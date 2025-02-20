@@ -42,7 +42,10 @@ public class GestorTasques {
         if (dataInici != null && dataInici.isBefore(LocalDate.now())) {
             throw new Exception("La data d'inici no pot ser anterior a la data actual.");
         }
-
+        // Correció aquí
+        if (prioritat != null && (prioritat < 1 || prioritat > 5)) {
+            throw new Exception("La prioritat ha de ser un valor entre 1 i 5");
+        }
         Tasca novaTasca = new Tasca(descripcio);
         novaTasca.setDataInici(dataInici);
         novaTasca.setDataFiPrevista(dataFiPrevista);
@@ -82,6 +85,7 @@ public class GestorTasques {
         for (Tasca tasca : llista) {
             if (tasca.getId() == id) {
                 tasca.setCompletada(true);
+                tasca.setDataFiReal(LocalDate.now()); // <-- Correcció aquí
                 tascaModificada = tasca;
                 break;
             }
@@ -154,10 +158,14 @@ public class GestorTasques {
     public List<Tasca> llistarTasquesPerComplecio(boolean filtreCompletada) {
         List<Tasca> tasquesFiltrades = new ArrayList<>();
         for (Tasca tasca : llistarTasques()) {
-            if (tasca.isCompletada() && filtreCompletada) {
+            if (tasca.isCompletada() == filtreCompletada) {  // <-- Correcció aquí
                 tasquesFiltrades.add(tasca);
             }
         }
         return tasquesFiltrades;
     }
+    
+
+
+    
 }
