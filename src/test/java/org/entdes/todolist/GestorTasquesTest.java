@@ -1,10 +1,10 @@
 package org.entdes.todolist;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDate;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class GestorTasquesTest {
     private GestorTasques gestor;
@@ -22,35 +22,15 @@ class GestorTasquesTest {
     }
 
     @Test
-    void eliminarTasca() {
+    void testAfegirTascaAmbDescripcioBuida() {
+        Exception ex = assertThrows(Exception.class, () -> gestor.afegirTasca("", null, null, null));
+        assertEquals("La descripció no pot estar buida.", ex.getMessage());
     }
 
     @Test
-    void marcarCompletada() {
-    }
-
-    @Test
-    void modificarTasca() {
-    }
-
-    @Test
-    void obtenirTasca() {
-    }
-
-    @Test
-    void getNombreTasques() {
-    }
-
-    @Test
-    void llistarTasques() {
-    }
-
-    @Test
-    void llistarTasquesPerDescripcio() {
-    }
-
-    @Test
-    void llistarTasquesPerComplecio() {
+    void testAfegirTascaAmbDescripcioNull() {
+        Exception ex = assertThrows(Exception.class, () -> gestor.afegirTasca(null, null, null, null));
+        assertEquals("La descripció no pot estar buida.", ex.getMessage());
     }
 
     @Test
@@ -64,7 +44,7 @@ class GestorTasquesTest {
     }
 
     @Test
-    void noPermetreTasquesAmbMismaDescripcioIgnorantMajusculesMinuscules() {
+    void noPermetreTasquesAmbMateixaDescripcioIgnorantMajusculesMinuscules() {
         Exception exception = assertThrows(Exception.class, () -> {
             gestor.afegirTasca("Fer esport", null, null, null);
             gestor.afegirTasca("fer esport", null, null, null);
@@ -73,7 +53,7 @@ class GestorTasquesTest {
     }
 
     @Test
-    void haHaverLlistatAmbNombreTotalTasques() throws Exception {
+    void llistatAmbNombreTotalTasques() throws Exception {
         assertEquals(0, gestor.getNombreTasques());
         gestor.afegirTasca("Tasca 1", null, null, null);
         gestor.afegirTasca("Tasca 2", null, null, null);
@@ -106,47 +86,39 @@ class GestorTasquesTest {
     }
 
     @Test
-void testFiltresIndependents() throws Exception {
-    GestorTasques gestor = new GestorTasques();
+    void testFiltresIndependents() throws Exception {
+        int id1 = gestor.afegirTasca("Comprar pa", null, null, null);
+        int id2 = gestor.afegirTasca("Fer exercici", null, null, null);
+        int id3 = gestor.afegirTasca("Comprar llet", null, null, null);
 
-    int id1 = gestor.afegirTasca("Comprar pa", null, null, null);
-    int id2 = gestor.afegirTasca("Fer exercici", null, null, null);
-    int id3 = gestor.afegirTasca("Comprar llet", null, null, null);
+        gestor.marcarCompletada(id1);
 
-    gestor.marcarCompletada(id1);
+        List<Tasca> tasquesFiltradesPerDescripcio = gestor.llistarTasquesPerDescripcio("Comprar");
+        assertEquals(2, tasquesFiltradesPerDescripcio.size());
 
-    // Filtrar per descripció "Comprar"
-    List<Tasca> tasquesFiltradesPerDescripcio = gestor.llistarTasquesPerDescripcio("Comprar");
-    assertEquals(2, tasquesFiltradesPerDescripcio.size());  // "Comprar pa" i "Comprar llet"
+        List<Tasca> tasquesCompletades = gestor.llistarTasquesPerComplecio(true);
+        assertEquals(1, tasquesCompletades.size());
 
-    // Filtrar per compleció (només completades)
-    List<Tasca> tasquesCompletades = gestor.llistarTasquesPerComplecio(true);
-    assertEquals(1, tasquesCompletades.size());  // Només "Comprar pa"
+        List<Tasca> tasquesNoCompletades = gestor.llistarTasquesPerComplecio(false);
+        assertEquals(2, tasquesNoCompletades.size());
 
-    // Filtrar per compleció (només no completades)
-    List<Tasca> tasquesNoCompletades = gestor.llistarTasquesPerComplecio(false);
-    assertEquals(2, tasquesNoCompletades.size());  // "Fer exercici" i "Comprar llet"
+        List<Tasca> totesLesTasques = gestor.llistarTasques();
+        assertEquals(3, totesLesTasques.size());
+    }
 
-    // Sense filtres, s'han de mostrar totes les tasques
-    List<Tasca> totesLesTasques = gestor.llistarTasques();
-    assertEquals(3, totesLesTasques.size());
-}
-void testBotonsPerCadaTasca() throws Exception {
+    @Test
+    void testBotonsPerCadaTasca() throws Exception {
         int id = gestor.afegirTasca("Fer la compra", LocalDate.now(), LocalDate.now().plusDays(2), 3);
         
         Tasca tasca = gestor.obtenirTasca(id);
         assertNotNull(tasca);
 
-        // Marcar com completada
-        assertFalse(tasca.isCompletada());
         gestor.marcarCompletada(id);
         assertTrue(gestor.obtenirTasca(id).isCompletada());
 
-        // Editar la tasca
         gestor.modificarTasca(id, "Comprar menjar", false, LocalDate.now(), LocalDate.now().plusDays(2), 4);
         assertEquals("Comprar menjar", gestor.obtenirTasca(id).getDescripcio());
 
-        // Eliminar la tasca
         gestor.eliminarTasca(id);
         assertThrows(Exception.class, () -> gestor.obtenirTasca(id));
     }
@@ -161,6 +133,7 @@ void testBotonsPerCadaTasca() throws Exception {
         assertEquals("Fer running", tasca.getDescripcio());
         assertTrue(tasca.isCompletada());
         assertEquals(5, tasca.getPrioritat());
+        assertEquals(LocalDate.now(), tasca.getDataFiReal());
     }
 
     @Test
@@ -170,7 +143,6 @@ void testBotonsPerCadaTasca() throws Exception {
         gestor.marcarCompletada(id);
         assertEquals(LocalDate.now(), gestor.obtenirTasca(id).getDataFiReal());
 
-        // Desmarcar la tasca com completada ha de buidar la data fi real
         gestor.modificarTasca(id, "Llegir un llibre", false, LocalDate.now(), LocalDate.now().plusDays(4), 4);
         assertNull(gestor.obtenirTasca(id).getDataFiReal());
     }
@@ -195,5 +167,68 @@ void testBotonsPerCadaTasca() throws Exception {
         Exception ex2 = assertThrows(Exception.class, () -> 
             gestor.afegirTasca("Prioritat alta", LocalDate.now(), LocalDate.now().plusDays(2), 6));
         assertEquals("La prioritat ha de ser un valor entre 1 i 5", ex2.getMessage());
+    }
+
+    @Test
+    void testMarcarCompletadaTascaNoExistent() {
+        Exception ex = assertThrows(Exception.class, () -> gestor.marcarCompletada(999));
+        assertEquals("La tasca no existeix", ex.getMessage());
+    }
+
+    @Test
+    void testEliminarTascaNoExistent() {
+        Exception ex = assertThrows(Exception.class, () -> gestor.eliminarTasca(999));
+        assertEquals("La tasca no existeix", ex.getMessage());
+    }
+
+    @Test
+    void testObtenirTascaNoExistent() {
+        Exception ex = assertThrows(Exception.class, () -> gestor.obtenirTasca(999));
+        assertEquals("La tasca no existeix", ex.getMessage());
+    }
+
+    @Test
+    void testModificarTascaAmbDescripcioDuplicada() throws Exception {
+        gestor.afegirTasca("Tasca original", null, null, null);
+        int id = gestor.afegirTasca("Altre tasca", null, null, null);
+        
+        Exception ex = assertThrows(Exception.class, () -> 
+            gestor.modificarTasca(id, "TASCA ORIGINAL", null, null, null, null));
+        assertEquals("Ja existeix una tasca amb la mateixa descripció", ex.getMessage());
+    }
+
+    @Test
+    void testModificarPrioritatInvalida() throws Exception {
+        int id = gestor.afegirTasca("Tasca", null, null, 2);
+        Exception ex = assertThrows(Exception.class, () ->
+            gestor.modificarTasca(id, "Tasca", null, null, null, 0));
+        assertEquals("La prioritat ha de ser un valor entre 1 i 5", ex.getMessage());
+    }
+
+    @Test
+    void testModificarTascaSenseCanviarCompletada() throws Exception {
+        int id = gestor.afegirTasca("Tasca", null, null, null);
+        gestor.marcarCompletada(id);
+        
+        gestor.modificarTasca(id, "Tasca modificada", null, null, null, null);
+        
+        Tasca tasca = gestor.obtenirTasca(id);
+        assertTrue(tasca.isCompletada());
+    }
+
+    @Test
+    void testModificarTascaAmbDataIniciAnteriorActual() throws Exception {
+        int id = gestor.afegirTasca("Tasca original", LocalDate.now(), null, null);
+        Exception ex = assertThrows(Exception.class, () ->
+            gestor.modificarTasca(id, "Tasca modificada", null, LocalDate.now().minusDays(1), null, null));
+        assertEquals("La data d'inici no pot ser anterior a la data actual.", ex.getMessage());
+    }
+
+    @Test
+    void testFiltrarTasquesPerDescripcioBuit() throws Exception {
+        gestor.afegirTasca("Tasca 1", null, null, null);
+        gestor.afegirTasca("Tasca 2", null, null, null);
+        List<Tasca> resultats = gestor.llistarTasquesPerDescripcio("");
+        assertEquals(2, resultats.size());
     }
 }

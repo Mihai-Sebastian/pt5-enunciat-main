@@ -83,4 +83,7 @@ public class Tasca {
     public String toString() {
         return descripcio + ": " + (completada ? "Completada" : "Pendent");            
     }
+    public static void resetIdCounter() {
+        idCounter = 0;
+    }
 }

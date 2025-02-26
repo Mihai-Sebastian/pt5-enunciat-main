@@ -42,7 +42,7 @@ public class GestorTasques {
         if (dataInici != null && dataInici.isBefore(LocalDate.now())) {
             throw new Exception("La data d'inici no pot ser anterior a la data actual.");
         }
-        // Correció aquí
+        // Correció de la prioritat per a que estigue entre 1 i 5.
         if (prioritat != null && (prioritat < 1 || prioritat > 5)) {
             throw new Exception("La prioritat ha de ser un valor entre 1 i 5");
         }
@@ -85,7 +85,7 @@ public class GestorTasques {
         for (Tasca tasca : llista) {
             if (tasca.getId() == id) {
                 tasca.setCompletada(true);
-                tasca.setDataFiReal(LocalDate.now()); // <-- Correcció aquí
+                tasca.setDataFiReal(LocalDate.now()); // <-- Correcció aquí per a indicar la data real
                 tascaModificada = tasca;
                 break;
             }
@@ -106,6 +106,11 @@ public class GestorTasques {
             throw new Exception("La data d'inici no pot ser posterior a la data fi prevista.");
         }
 
+        // Validació per data inici anterior a avui
+         if (dataInici != null && dataInici.isBefore(LocalDate.now())) {
+            throw new Exception("La data d'inici no pot ser anterior a la data actual.");
+        }
+
         if (prioritat != null && (prioritat < 1 || prioritat > 5)) {
             throw new Exception("La prioritat ha de ser un valor entre 1 i 5");
         }
@@ -113,11 +118,20 @@ public class GestorTasques {
         Tasca tascaModificada = null;
         for (Tasca tasca : llista) {
             if (tasca.getId() == id) {
-                if (tasca.isCompletada() && (completada == null || !completada)) {
-                    tasca.setDataFiReal(null);
+                // Actualitzar dataFiReal
+                if (completada != null) {
+                    if (completada) {
+                        tasca.setDataFiReal(LocalDate.now());
+                    } else {
+                        tasca.setDataFiReal(null);
+                    }
                 }
-                tasca.setCompletada(completada == null ? false : completada);
+                tasca.setCompletada(completada != null ? completada : tasca.isCompletada());
                 tasca.setDescripcio(novaDescripcio);
+                // correcció per a mostrar dataInici i dataFiPrevista al editar.
+                tasca.setDataInici(dataInici);
+                tasca.setDataFiPrevista(dataFiPrevista);
+
                 tasca.setPrioritat(prioritat);
                 tascaModificada = tasca;
                 break;
@@ -158,14 +172,10 @@ public class GestorTasques {
     public List<Tasca> llistarTasquesPerComplecio(boolean filtreCompletada) {
         List<Tasca> tasquesFiltrades = new ArrayList<>();
         for (Tasca tasca : llistarTasques()) {
-            if (tasca.isCompletada() == filtreCompletada) {  // <-- Correcció aquí
+            if (tasca.isCompletada() == filtreCompletada) {  // <-- Correcció aquí per aplicar el filtre correctament.
                 tasquesFiltrades.add(tasca);
             }
         }
         return tasquesFiltrades;
     }
-    
-
-
-    
 }
